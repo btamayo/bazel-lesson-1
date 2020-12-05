@@ -4,7 +4,7 @@ This is a conversational introduction to Bazel. The first lesson will introduce 
 
 This text assumes you're running macOS 10.14, but it shouldn't be difficult to adapt the instructions for other operating systems. To get started, install [Bazel](https://docs.bazel.build/versions/master/install.html) and [Homebrew](https://brew.sh/), and make sure you have XCode installed.
 
-```
+```shell
 $ bazel version
 Build label: 0.24.1
 Build target: bazel-out/darwin-opt/bin/src/main/java/com/google/devtools/build/lib/bazel/BazelServer_deploy.jar
@@ -20,7 +20,7 @@ Homebrew/homebrew-cask (git revision 340e6; last commit 2019-04-16)
 
 Install graphviz, which we'll use to visualize our build.
 
-```
+```shell
 $ brew install graphviz
 ... (this will build a lot of stuff) ...
 $ dot -V
@@ -29,12 +29,14 @@ dot - graphviz version 2.40.1 (20161225.0304)
 
 # A simple C++ command line app
 
-At the root of this repository, you'll see a file in all-caps called WORKSPACE. We won't get into its contents, but its purpose is to describe dependencies, both for our applications and extensions to Bazel itself.
+At the root of this repository, you'll see a file in all-caps called **`WORKSPACE`**. We won't get into its contents, but its purpose is to describe dependencies, both for our applications and extensions to Bazel itself.
 
-The first thing we'll build is a trivial C++ command line application, with an associated library and a test. Bazel distributes what it calls "targets" throughout the project's directories. You specify targets using a path syntax, where "//" identifies the top-level directory that contains WORKSPACE. If you look in `cpp/BUILD`, you'll find three targets.
+The first thing we'll build is a trivial C++ command line application, with an associated library and a test. Bazel distributes what it calls "**targets**" throughout the project's directories. You specify targets using a path syntax, where "`//`" identifies the top-level directory that contains `WORKSPACE`. 
 
-```
-$ more cpp/BUILD 
+
+If you look in `cpp/BUILD`, you'll find three targets:
+
+```bazel
 cc_binary(
     name = "basic-app",
     srcs = ["basic_app.cpp"],
@@ -61,9 +63,9 @@ cc_test(
 )
 ```
 
-The cc_binary target called "basic-app" is a command line binary you can run:
+The `cc_binary` **target** called "basic-app" is a command line binary you can run:
 
-```
+```shell
 $ bazel run //cpp:basic-app
 INFO: Analysed target //cpp:basic-app (14 packages loaded, 128 targets configured).
 INFO: Found 1 target...
@@ -78,9 +80,16 @@ I'm a C++ string!
 
 ```
 
-What this does is create the binary, copy it into a working directory, and then run it. This ends up being really handy for packaging, because you can specify data files as dependencies and have them copied to the right place, without worrying about doing this yourself. Let's take a look at the dependencies of this tiny app with Bazel's query language.
+What this does is: 
+1. create the binary
+2. copy it into a working directory
+3. and then run it. 
+   
+This ends up being really handy for packaging, because you can specify data files as dependencies and have them copied to the right place, without worrying about doing this yourself. 
 
-```
+Let's take a look at the dependencies of this tiny app with Bazel's **query** language.
+
+```shell
 $ bazel query "deps(//cpp:basic-app)"
 //cpp:basic-app
 //cpp:basic_app.cpp
@@ -117,9 +126,9 @@ $ bazel query "deps(//cpp:basic-app)"
 Loading: 2 packages loaded
 ```
 
-This shows that our app depends on the files in our library, and the local C/C++ compiler (XCode). You can specify a specific compiler and toolchain in WORKSPACE for better reproducibility. If we add a few flags, we can narrow down the returned values to just our code.
+This shows that our app depends on the files in our library, and the local C/C++ compiler (XCode). You can specify a specific compiler and toolchain in `WORKSPACE` for better reproducibility. If we add a few flags, we can narrow down the returned values to just our code.
 
-```
+```shell
 $ bazel query  --nohost_deps --noimplicit_deps "deps(//cpp:basic-app)"
 //cpp:basic-app
 //cpp:basic_app.cpp
@@ -130,14 +139,16 @@ $ bazel query  --nohost_deps --noimplicit_deps "deps(//cpp:basic-app)"
 
 And, we can visualize it using graphviz:
 
-`$ bazel query  --nohost_deps --noimplicit_deps "deps(//cpp:basic-app)" --output=graph | dot -Tpng | open -f -a /Applications/Preview.app`
+```shell
+$ bazel query  --nohost_deps --noimplicit_deps "deps(//cpp:basic-app)" --output=graph | dot -Tpng | open -f -a /Applications/Preview.app
+```
 
 ![alt text](./basic_cpp.png "Bazel graph output")
 
 
 If you take a look at Bazel's output, you can see what's been built:
 
-```
+```shell
 $ ls -l bazel-out/darwin-fastbuild/bin/cpp/
 total 64
 drwxr-xr-x  4 sayrer  wheel    128 Apr 23 10:14 _objs
@@ -149,7 +160,7 @@ drwxr-xr-x  4 sayrer  wheel    128 Apr 23 10:14 basic-app.runfiles
 
 Next, we'll run our C++ test. The "..." at the end of the path tells bazel to run every test target under the //cpp/ path.
 
-```
+```shell
 $ bazel test //cpp/...
 
 INFO: Elapsed time: 3.080s, Critical Path: 2.83s
@@ -169,7 +180,7 @@ This caching feature applies to tests and builds, it will work in the presence o
 
 The setup for Java is pretty similar, except that the convention is to follow Maven's directory structure. 
 
-```
+```shell
 $ bazel run //java/basic:command
 INFO: Analysed target //java/basic:command (21 packages loaded, 483 targets configured).
 INFO: Found 1 target...
@@ -187,7 +198,7 @@ Hi from Java!
 
 Running the tests is a similar experience as well:
 
-```
+```shell
 $ bazel test //java/...
 INFO: Analysed 3 targets (1 packages loaded, 6 targets configured).
 INFO: Found 2 targets and 1 test target...
@@ -216,7 +227,7 @@ INFO: Build completed successfully, 1 total action
 
 To wrap up this lesson, we'll combine our C++ and Java libraries in one executable using JNI.
 
-```
+```shell
 $ bazel run -s //java/jni:command
 INFO: Analysed target //java/jni:command (0 packages loaded, 0 targets configured).
 INFO: Found 1 target...
@@ -237,7 +248,9 @@ I'm a C++ string!
 
 Here, you can see our Java binary running the Java and C++ libraries we just built. To get a look at the dependency graph, run this command:
 
-`bazel query  --nohost_deps --noimplicit_deps "deps(//java/jni:command)" --output=graph | dot -Tpng | open -f -a /Applications/Preview.app`
+```shell
+bazel query  --nohost_deps --noimplicit_deps "deps(//java/jni:command)" --output=graph | dot -Tpng | open -f -a /Applications/Preview.app
+```
 
 If you go back and edit `cpp/basic_library.cpp`, you'll find that this target gets rebuilt as well.
 
