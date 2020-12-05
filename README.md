@@ -6,16 +6,15 @@ This text assumes you're running macOS 10.14, but it shouldn't be difficult to a
 
 ```shell
 $ bazel version
-Build label: 0.24.1
+Build label: 3.7.1-homebrew
 Build target: bazel-out/darwin-opt/bin/src/main/java/com/google/devtools/build/lib/bazel/BazelServer_deploy.jar
-Build time: Tue Apr 2 16:32:47 2019 (1554222767)
-Build timestamp: 1554222767
-Build timestamp as int: 1554222767
+Build time: Tue Nov 24 20:21:33 2020 (1606249293)
+Build timestamp: 1606249293
+Build timestamp as int: 1606249293
 
 $ brew --version
-Homebrew 2.1.1
-Homebrew/homebrew-core (git revision 11fb; last commit 2019-04-16)
-Homebrew/homebrew-cask (git revision 340e6; last commit 2019-04-16)
+Homebrew 2.6.0
+Homebrew/homebrew-core (git revision 619e1; last commit 2020-12-05)
 ```
 
 Install graphviz, which we'll use to visualize our build.
@@ -24,7 +23,7 @@ Install graphviz, which we'll use to visualize our build.
 $ brew install graphviz
 ... (this will build a lot of stuff) ...
 $ dot -V
-dot - graphviz version 2.40.1 (20161225.0304)
+dot - graphviz version 2.44.1 (20200629.0846)
 ```
 
 # A simple C++ command line app
